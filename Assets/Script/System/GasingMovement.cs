@@ -1,8 +1,11 @@
 using UnityEngine;
 using System.Collections;
+using NUnit.Framework;
 
 public class GasingMovement : MonoBehaviour
 {
+
+    [SerializeField] private float shakeStrength, shakeDuration;
     private Rigidbody rb;
 
     [Header("Movement Otomatis")]
@@ -12,6 +15,8 @@ public class GasingMovement : MonoBehaviour
 
     [Header("Kontrol Player (Support)")]
     public float playerForceMultiplier = 0.1f; // Rasio 1:10
+
+    [SerializeField] private float knockbackForce = 10f;
 
     void Start()
     {
@@ -57,5 +62,40 @@ public class GasingMovement : MonoBehaviour
             // setiap dua detik bakal jalanin fungsi ini lg
             yield return new WaitForSeconds(changeDirectionInterval);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Vector3 enemyPosition = collision.transform.position;
+            Vector3 myPosition = transform.position;
+
+            Vector3 knockbackDirection = (myPosition - enemyPosition).normalized;
+            GameEvents.CallShake.Invoke(shakeDuration, shakeStrength);
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+                
+                // Menjalankan fungsi Coroutine untuk efek slow-mo
+                StartCoroutine(SlowMotionEffect());
+            }
+            else
+            {
+                Debug.LogWarning("Objek ini tidak memiliki Rigidbody untuk knockback!");
+            }
+        }
+    }
+
+    // Fungsi Coroutine untuk mengatur durasi efek
+    private IEnumerator SlowMotionEffect() {
+        Time.timeScale = 0.1f;
+        
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+        yield return new WaitForSecondsRealtime(0.75f);
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
     }
 }

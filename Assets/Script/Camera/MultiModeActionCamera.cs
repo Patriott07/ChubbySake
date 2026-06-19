@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using DG.Tweening;
 
 public class MultiModeActionCamera : MonoBehaviour
 {
@@ -201,5 +203,36 @@ public class MultiModeActionCamera : MonoBehaviour
         }
         return jarakMaks;
     }
+
+    public void CameraShake(float duration, float strength)
+    {
+        StartCoroutine(Shake(duration, strength));
+    }
+
+    private IEnumerator Shake(float duration, float strength)
+    {
+        Vector3 originalPosition = transform.localPosition;
+        
+        float elapsed = 0.0f;
+
+        while (elapsed < duration)
+        {
+            float x = Random.Range(-1f, 1f) * strength;
+            float y = Random.Range(-1f, 1f) * strength;
+
+            transform.localPosition = new Vector3(originalPosition.x + x, originalPosition.y + y, originalPosition.z);
+
+            elapsed += Time.unscaledDeltaTime;
+
+            yield return null;
+        }
+        transform.localPosition = originalPosition;
+    }
     #endregion
+
+    void OnEnable() {
+        GameEvents.CallShake += CameraShake; }
+    void OnDisable() {
+        GameEvents.CallShake -= CameraShake; }   
+
 }
