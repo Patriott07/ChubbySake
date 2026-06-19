@@ -5,6 +5,9 @@ public class GasingMovement : MonoBehaviour
 {
     private Rigidbody rb;
 
+    [Header("Visualization")]
+    public float speedRotateModel = 500f;
+
     [Header("Movement Otomatis")]
     public float autoSpeed = 5f;
     public float changeDirectionInterval = 2f;
@@ -23,7 +26,7 @@ public class GasingMovement : MonoBehaviour
     void Update()
     {
         // Tetap pastikan gasing berputar secara visual
-        transform.Rotate(Vector3.up * 500 * Time.deltaTime);
+        transform.Rotate(Vector3.up * speedRotateModel * Time.deltaTime);
     }
 
     void FixedUpdate()
