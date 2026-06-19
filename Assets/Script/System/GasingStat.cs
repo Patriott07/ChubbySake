@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Rendering;
 
 public class GasingStat : MonoBehaviour
 {
@@ -132,5 +133,21 @@ public class GasingStat : MonoBehaviour
         Debug.Log($"{gameObject.name} KALAH SEPENUHNYA! Game Over.");
         // Nanti di sini kita panggil UI Game Over / Pemenang
         gameObject.SetActive(false); 
+    }
+
+
+    void HealthPlayerDecrease(float playerHPDec)
+    {
+        currentHp -= playerHPDec;
+        
+        if(currentHp <= 0)
+        {
+            // fungdi apa gitu ? yang bertanggung jawab atas selesainya ronde
+        }
+    }
+
+    void Update()
+    {
+        
     }
 }

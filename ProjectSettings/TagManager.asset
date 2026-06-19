@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Musuh
+  - Enemy
   layers:
   - Default
   - TransparentFX
