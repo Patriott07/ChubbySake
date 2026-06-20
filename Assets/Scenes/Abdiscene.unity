@@ -870,7 +870,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.084905684, g: 0.084905684, b: 0.084905684, a: 0}
+  m_BackGroundColor: {r: 1, g: 0.7122642, b: 0.7122642, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1033,7 +1033,7 @@ GameObject:
   - component: {fileID: 518059119}
   m_Layer: 0
   m_Name: Gasing Musuh
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1077,10 +1077,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0d5f2967a0b0784d91da77943c3f66c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speedRotateModel: 500
+  shakeStrength: 0
+  shakeDuration: 0
+  speedRotateModel: 300
+  directionLine: {fileID: 0}
+  lineLength: 2
   autoSpeed: 7
   changeDirectionInterval: 0.8
   playerForceMultiplier: 0
+  isControlSupport: 0
+  knockbackForce: 4
+  hitCooldown: 0.2
 --- !u!114 &518059121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1094,10 +1101,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   namaGasing: Chibby Gasing
-  maxHp: 100
+  damage: 100
+  maxHp: 400
   currentHp: 0
   maxNyawa: 3
   currentNyawa: 0
+  currentRPM: 0
+  maxRPM: 1200
+  minRPM: 400
+  rpmRegenSpeed: 50
+  currentEnergyAttack: 0
+  currentEnergyUltimate: 0
   defHead: 1
   defBody: 0.8
   defHand: 1.2
@@ -1596,7 +1610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5f3da96a4ec728d43a70d9a0de3bd1df, type: 3}
       propertyPath: m_Name
-      value: blade
+      value: Arena
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -2181,6 +2195,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893320644}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1977603870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1977603872}
+  - component: {fileID: 1977603871}
+  m_Layer: 0
+  m_Name: GameEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1977603871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977603870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58e16f95a3204cd4586b4056cac3979d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1977603872
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977603870}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 13.5, y: 4.08806, z: 3.01752}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1995169104
 GameObject:
   m_ObjectHideFlags: 0
@@ -2395,56 +2453,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 769893054274563460, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: speedRotateModel
-      value: 900
+      propertyPath: knockbackForce
+      value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 3696584803340284246, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 9d4baacad7bfd0b4ab2119503a414eb7, type: 2}
+    - target: {fileID: 2303387605679267149, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
+      propertyPath: damage
+      value: 36
+      objectReference: {fileID: 0}
     - target: {fileID: 4172002264163435597, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
       propertyPath: m_Name
       value: Gasing Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4482029547017502414, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.8124111
-      objectReference: {fileID: 0}
-    - target: {fileID: 4482029547017502414, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.000000029802319
-      objectReference: {fileID: 0}
-    - target: {fileID: 4482029547017502414, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.00000008940696
-      objectReference: {fileID: 0}
-    - target: {fileID: 4482029547017502414, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.5830851
-      objectReference: {fileID: 0}
-    - target: {fileID: 4482029547017502414, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 71.336
-      objectReference: {fileID: 0}
-    - target: {fileID: 4861779203762412450, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.8551689
-      objectReference: {fileID: 0}
-    - target: {fileID: 4861779203762412450, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.00000004470348
-      objectReference: {fileID: 0}
-    - target: {fileID: 4861779203762412450, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.0000000074505797
-      objectReference: {fileID: 0}
-    - target: {fileID: 4861779203762412450, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.5183495
-      objectReference: {fileID: 0}
-    - target: {fileID: 4861779203762412450, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 62.443
       objectReference: {fileID: 0}
     - target: {fileID: 5341844685992988758, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2486,18 +2504,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5940990266576237705, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 9d4baacad7bfd0b4ab2119503a414eb7, type: 2}
-    - target: {fileID: 6564143684856452945, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 9d4baacad7bfd0b4ab2119503a414eb7, type: 2}
-    - target: {fileID: 6885366273516510538, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 9d4baacad7bfd0b4ab2119503a414eb7, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2515,3 +2521,4 @@ SceneRoots:
   - {fileID: 518059122}
   - {fileID: 1283055469}
   - {fileID: 1058668168}
+  - {fileID: 1977603872}

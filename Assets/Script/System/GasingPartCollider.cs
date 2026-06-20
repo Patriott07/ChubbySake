@@ -29,7 +29,7 @@ public class GasingPartCollider : MonoBehaviour
             // Kirim data tabrakan ini ke script utama di Parent untuk dikalkulasi ke HP/Stat
             if (scriptUtamaParent != null)
             {
-                scriptUtamaParent.TerimaDamagePart(jenisPart, kekuatanBenturan);
+                // scriptUtamaParent.TerimaDamagePart(jenisPart, kekuatanBenturan, null);
             }
 
             // Cari kamera utama dan trigger guncangan

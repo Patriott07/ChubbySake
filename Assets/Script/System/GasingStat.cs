@@ -1,15 +1,23 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Rendering;
+using System;
 
 public class GasingStat : MonoBehaviour
 {
     [Header("Stat Dasar Gasing")]
     public string namaGasing = "Chibby Gasing";
-    public float maxHp = 100f;
+    public float damage = 10f;
+    public float maxHp = 1000f;
     public float currentHp;
     public int maxNyawa = 3;
     public int currentNyawa;
+    public float currentRPM;
+    public float maxRPM = 1200f;
+    public float minRPM = 400f;
+    public float rpmRegenSpeed = 50f; // Jumlah RPM yang bertambah per detik saat bebas
+    public float currentEnergyAttack = 0; // max 100
+    public float currentEnergyUltimate = 0; // max 100
 
     [Header("Stat Defense Per Part (Multiplier)")]
     [Tooltip("Semakin kecil nilainya, semakin kuat pertahanannya (misal: 0.5 berarti damage diskon 50%)")]
@@ -21,6 +29,7 @@ public class GasingStat : MonoBehaviour
     [Header("Sistem Respawn")]
     public Transform titikRespawn; // Taruh empty GameObject di tengah arena untuk titik respawn
     private Rigidbody rb;
+    private bool isColliding = false; // Untuk cek apakah boleh regen RPM
 
     void Start()
     {
@@ -28,17 +37,28 @@ public class GasingStat : MonoBehaviour
         ResetGasing();
     }
 
+    void Update()
+    {
+        // 5. currentRPM bertambah jika TIDAK bersentuhan dengan enemy / obstacle
+        if (!isColliding && currentRPM < maxRPM)
+        {
+            currentRPM += rpmRegenSpeed * Time.deltaTime;
+            currentRPM = Mathf.Clamp(currentRPM, minRPM, maxRPM); // Gaboleh lebih dari max
+        }
+    }
+
     // Menginisialisasi ulang stat saat game mulai atau reset
     public void ResetGasing()
     {
         currentHp = maxHp;
         currentNyawa = maxNyawa;
+        currentRPM = maxRPM / 4; // Mulai dengan RPM penuh
     }
 
     /// <summary>
     /// Fungsi utama yang dipanggil oleh child colliders saat terjadi benturan
     /// </summary>
-    public void TerimaDamagePart(GasingPartCollider.PartType jenisPart, float kekuatanBenturan)
+    public void TerimaDamagePart(GasingPartCollider.PartType jenisPart, float kekuatanBenturan, Action<float> action)
     {
         // Jika darah sudah habis atau nyawa habis, abaikan kalkulasi
         if (currentHp <= 0 || currentNyawa <= 0) return;
@@ -64,8 +84,9 @@ public class GasingStat : MonoBehaviour
 
         // Rumus Damage Dasar: Kekuatan Benturan x Faktor Defense Part
         // Kamu bisa mengalikan dengan konstanta (misal 0.5f) jika dirasa terlalu sakit
-        float damageAkhir = kekuatanBenturan * multiplierDefense * 0.5f;
-        
+        // float damageAkhir = kekuatanBenturan * multiplierDefense * 0.5f;
+        float damageAkhir = kekuatanBenturan;
+
         // Kurangi HP
         currentHp -= damageAkhir;
         Debug.Log($"{gameObject.name} terkena damage sebesar {damageAkhir:F1} pada bagian {jenisPart}. Sisa HP: {currentHp:F1}");
@@ -85,6 +106,24 @@ public class GasingStat : MonoBehaviour
         {
             KurangiNyawaDanRespawn();
         }
+
+        action?.Invoke(damageAkhir);
+        
+        
+    }
+
+    public void DecreaseRPM()
+    {
+        // 2. currentRPM berkurang 200 sampai 300 secara acak
+        float rpmMinus = UnityEngine.Random.Range(200f, 300f);
+        currentRPM -= rpmMinus;
+        currentRPM = Mathf.Clamp(currentRPM, minRPM, maxRPM); // Gaboleh kurang dari min
+    }
+
+    public void IncreaseEnergyAttack(float val)
+    {
+        currentEnergyAttack += val;
+        currentEnergyAttack = Mathf.Clamp(val, 0, 100); // Gaboleh kurang dari min
     }
 
     /// <summary>
@@ -110,7 +149,7 @@ public class GasingStat : MonoBehaviour
         // Hentikan pergerakan fisik gasing sesaat saat mati
         rb.linearVelocity = Vector3.zero; // Catatan: Gunakan rb.velocity jika kamu pakai Unity versi lama
         rb.angularVelocity = Vector3.zero;
-        
+
         // Pindahkan ke titik aman (tengah arena)
         if (titikRespawn != null)
         {
@@ -123,7 +162,8 @@ public class GasingStat : MonoBehaviour
 
         // Reset HP kembali penuh untuk nyawa berikutnya
         currentHp = maxHp;
-        
+        currentRPM = maxRPM; // Reset RPM pas gasing respawn
+
         Debug.Log($"{gameObject.name} telah respawn di arena!");
         yield return null;
     }
@@ -132,22 +172,35 @@ public class GasingStat : MonoBehaviour
     {
         Debug.Log($"{gameObject.name} KALAH SEPENUHNYA! Game Over.");
         // Nanti di sini kita panggil UI Game Over / Pemenang
-        gameObject.SetActive(false); 
+        gameObject.SetActive(false);
     }
 
 
     void HealthPlayerDecrease(float playerHPDec)
     {
         currentHp -= playerHPDec;
-        
-        if(currentHp <= 0)
+
+        if (currentHp <= 0)
         {
             // fungdi apa gitu ? yang bertanggung jawab atas selesainya ronde
         }
     }
 
-    void Update()
+
+    // Mengatur kondisi deteksi tabrakan untuk fungsi pasif nomor 5
+    private void OnCollisionEnter(Collision collision)
     {
-        
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Obstacle"))
+        {
+            isColliding = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Obstacle"))
+        {
+            isColliding = false;
+        }
     }
 }

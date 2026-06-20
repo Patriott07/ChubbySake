@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Musuh
   - Enemy
+  - Obstacle
   layers:
   - Default
   - TransparentFX
