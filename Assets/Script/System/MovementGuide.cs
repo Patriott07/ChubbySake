@@ -33,7 +33,6 @@ public class MovementGuide : MonoBehaviour
 
         arrow.position = transform.position + offset;
 
-        // 🔥 sekarang rotasi cuma horizontal
         arrow.rotation = Quaternion.LookRotation(dir, Vector3.up);
     }
 }
