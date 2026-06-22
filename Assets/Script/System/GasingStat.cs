@@ -17,7 +17,9 @@ public class GasingStat : MonoBehaviour
     public float minRPM = 400f;
     public float rpmRegenSpeed = 50f; // Jumlah RPM yang bertambah per detik saat bebas
     public float currentEnergyAttack = 0; // max 100
+    public float maxEnergyAttack = 100;
     public float currentEnergyUltimate = 0; // max 100
+    public float maxEnergyUltimate = 100;
 
     [Header("Stat Defense Per Part (Multiplier)")]
     [Tooltip("Semakin kecil nilainya, semakin kuat pertahanannya (misal: 0.5 berarti damage diskon 50%)")]
@@ -29,12 +31,18 @@ public class GasingStat : MonoBehaviour
     [Header("Sistem Respawn")]
     public Transform titikRespawn; // Taruh empty GameObject di tengah arena untuk titik respawn
     private Rigidbody rb;
+
+    [Header("Status Action Attack")]
+    public bool isInvincibleAttack = false; // Efek kebal saat menyerang
+    public float damageTambahanQTE;
     private bool isColliding = false; // Untuk cek apakah boleh regen RPM
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        ResetGasing();
+
+        if (GetComponent<GasingAI>() == null)
+            ResetGasing();
     }
 
     void Update()
@@ -60,6 +68,9 @@ public class GasingStat : MonoBehaviour
     /// </summary>
     public void TerimaDamagePart(GasingPartCollider.PartType jenisPart, float kekuatanBenturan, Action<float> action)
     {
+        // Jika sedang dalam mode Action Attack yang kebal, abaikan semua damage masuk
+        if (isInvincibleAttack || kekuatanBenturan <= 0) return;
+
         // Jika darah sudah habis atau nyawa habis, abaikan kalkulasi
         if (currentHp <= 0 || currentNyawa <= 0) return;
 
@@ -108,8 +119,8 @@ public class GasingStat : MonoBehaviour
         }
 
         action?.Invoke(damageAkhir);
-        
-        
+
+
     }
 
     public void DecreaseRPM()
@@ -123,7 +134,7 @@ public class GasingStat : MonoBehaviour
     public void IncreaseEnergyAttack(float val)
     {
         currentEnergyAttack += val;
-        currentEnergyAttack = Mathf.Clamp(val, 0, 100); // Gaboleh kurang dari min
+        currentEnergyAttack = Mathf.Clamp(currentEnergyAttack, 0, maxEnergyAttack); // Gaboleh kurang dari min
     }
 
     /// <summary>
