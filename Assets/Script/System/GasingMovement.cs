@@ -179,8 +179,10 @@ public class GasingMovement : MonoBehaviour
                 // Anggap kekuatan benturan dasar berdasarkan kecepatan gerak gasing (misal: 10f)
                 stats.TerimaDamagePart(GasingPartCollider.PartType.Body, enemyStats.damage, null);
                 stats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damage + (0.02f * enemyStats.currentRPM), null);
+                stats.TerimaDamagePart(GasingPartCollider.PartType.Body, enemyStats.damageTambahanQTE, null);
+                enemyStats.damageTambahanQTE = 0;
                 enemyStats.DecreaseRPM();
-                stats.IncreaseEnergyAttack(UnityEngine.Random.Range(5, 8));
+                stats.IncreaseEnergyAttack(UnityEngine.Random.Range(100, 150));
             }
 
             // Trigger musuh agar menerima damage juga jika musuh punya GasingStat
@@ -188,6 +190,9 @@ public class GasingMovement : MonoBehaviour
             {
                 enemyStats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damage, null);
                 enemyStats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damage + (0.02f * stats.currentRPM), null);
+                enemyStats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damageTambahanQTE, null);
+                Debug.Log($"ENEMY GET BONUS ATTACK : {stats.damageTambahanQTE}");
+                stats.damageTambahanQTE = 0;
                 stats.DecreaseRPM();
                 enemyStats.IncreaseEnergyAttack(UnityEngine.Random.Range(5, 8));
             }
