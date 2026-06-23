@@ -99,14 +99,6 @@ public class GasingStat : MonoBehaviour
         currentHp -= damageAkhir;
         Debug.Log($"{gameObject.name} terkena damage sebesar {damageAkhir:F1} pada bagian {jenisPart}. Sisa HP: {currentHp:F1}");
 
-        if (gameObject.CompareTag("Player"))
-        {
-            ActionCamera cam = Camera.main.GetComponent<ActionCamera>();
-            if (cam != null && damageAkhir > 2f)
-            {
-            }
-        }
-
         if (currentHp <= 0)
         {
             KurangiNyawaDanRespawn();
@@ -131,7 +123,6 @@ public class GasingStat : MonoBehaviour
     public void KurangiNyawaDanRespawn()
     {
         roundCount++;
-        if (roundText != null) roundText.text = $"Round : {roundCount.ToString()}";
 
         if (gameObject.CompareTag("Enemy"))
         {
@@ -192,15 +183,13 @@ public class GasingStat : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ClaimRewards(float earnedGold, float earnedExp)
+    public void ClaimRewards(float earnedGold, float earnedExp) // funtion for reward system
     {
         gold += earnedGold;
         Exp += earnedExp;
-        
+
         if (rewardText != null)
-        {
             rewardText.text = $"Gold : {gold} | Exp : {Exp}";
-        }
     }
 
     void HealthPlayerDecrease(float playerHPDec)

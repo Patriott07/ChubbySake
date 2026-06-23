@@ -1,5 +1,11 @@
 Shader "Custom/ZOverHead"
 {
+    // Tambahkan blok Properties di sini agar muncul di Inspector
+    Properties
+    {
+        _MainTex ("Texture", 2D) = "white" {}
+    }
+
     SubShader
     {
         Tags { "Queue"="Overlay" }
