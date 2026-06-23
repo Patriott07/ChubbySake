@@ -1354,6 +1354,7 @@ GameObject:
   - component: {fileID: 518059119}
   - component: {fileID: 518059123}
   - component: {fileID: 518059124}
+  - component: {fileID: 518059125}
   m_Layer: 0
   m_Name: Gasing Musuh
   m_TagString: Enemy
@@ -1497,6 +1498,22 @@ MonoBehaviour:
   dashDuration: 0.4
   panelQTE: {fileID: 975566117}
   canvasGroupBgBlack: {fileID: 607426211}
+--- !u!114 &518059125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518059118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff454f9836a48b44b08702ac43b70e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tingkatKesulitan: 2
+  dashDuration: 0.4
+  attackDashSpeed: 40
+  energyGainRate: 5
 --- !u!1 &607426209
 GameObject:
   m_ObjectHideFlags: 0
@@ -1582,6 +1599,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 607426209}
   m_CullTransparentMesh: 1
+--- !u!1 &607694008
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 607694010}
+  - component: {fileID: 607694009}
+  m_Layer: 0
+  m_Name: Round Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &607694009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607694008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69b73271e5b8e4b479163de3805ce0d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnEnemyLoc: {fileID: 1316162065}
+  spawnPlayerLoc: {fileID: 767114929}
+  enemyObj: {fileID: 518059118}
+  playerObj: {fileID: 1399905082}
+  roundCount: 1
+  roundText: {fileID: 433987769}
+--- !u!4 &607694010
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607694008}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 136.60863, y: 230.02888, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &695959447
 GameObject:
   m_ObjectHideFlags: 0
@@ -3641,3 +3708,4 @@ SceneRoots:
   - {fileID: 228642198}
   - {fileID: 737570350}
   - {fileID: 764475513}
+  - {fileID: 607694010}

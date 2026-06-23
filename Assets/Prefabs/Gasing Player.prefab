@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 4172002264163435597}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 4.99, y: 4.49, z: -5.86688}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -51,20 +51,27 @@ MonoBehaviour:
   namaGasing: Chibby Gasing
   damage: 10
   maxHp: 1000
-  currentHp: 0
+  currentHp: 1000
   maxNyawa: 3
-  currentNyawa: 0
-  currentRPM: 0
+  currentNyawa: 3
+  currentRPM: 300
   maxRPM: 1200
   minRPM: 400
   rpmRegenSpeed: 50
   currentEnergyAttack: 0
+  maxEnergyAttack: 100
   currentEnergyUltimate: 0
+  maxEnergyUltimate: 100
   defHead: 1
   defBody: 0.8
   defHand: 1.2
   defLeg: 0.9
   titikRespawn: {fileID: 0}
+  isInvincibleAttack: 0
+  damageTambahanQTE: 0
+  roundText: {fileID: 0}
+  roundCount: 1
+  rewardText: {fileID: 0}
 --- !u!114 &769893054274563460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,6 +94,7 @@ MonoBehaviour:
   playerForceMultiplier: 0.04
   isControlSupport: 1
   knockbackForce: 10
+  hitCooldown: 0.2
 --- !u!54 &8824646661862571476
 Rigidbody:
   m_ObjectHideFlags: 0

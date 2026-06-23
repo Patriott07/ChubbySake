@@ -99,10 +99,7 @@ public class GasingStat : MonoBehaviour
         currentHp -= damageAkhir;
         Debug.Log($"{gameObject.name} terkena damage sebesar {damageAkhir:F1} pada bagian {jenisPart}. Sisa HP: {currentHp:F1}");
 
-        if (currentHp <= 0)
-        {
-            KurangiNyawaDanRespawn();
-        }
+        if (currentHp <= 0) RoundManager.instance.NewRound(gameObject.tag);
 
         action?.Invoke(damageAkhir);
     }
@@ -120,28 +117,14 @@ public class GasingStat : MonoBehaviour
         currentEnergyAttack = Mathf.Clamp(currentEnergyAttack, 0, maxEnergyAttack);
     }
 
+
+
+
+    // mungkin udah gak dipake #ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f
+    // nanti di edit
     public void KurangiNyawaDanRespawn()
     {
         roundCount++;
-
-        if (gameObject.CompareTag("Enemy"))
-        {
-            GameObject playerTarget = GameObject.FindGameObjectWithTag("Player");
-            if (playerTarget != null)
-            {
-                GasingStat playerStat = playerTarget.GetComponent<GasingStat>();
-                if (playerStat != null) playerStat.ClaimRewards(5f, 3.5f);
-            }
-        }
-        else if (gameObject.CompareTag("Player"))
-        {
-            GameObject enemyTarget = GameObject.FindGameObjectWithTag("Enemy");
-            if (enemyTarget != null)
-            {
-                GasingStat enemyStat = enemyTarget.GetComponent<GasingStat>();
-                if (enemyStat != null) enemyStat.ClaimRewards(5f, 3.5f);
-            }
-        }
 
         currentNyawa--;
         Debug.Log($"{gameObject.name} kehilangan 1 Nyawa! Sisa Nyawa: {currentNyawa}");
@@ -156,7 +139,7 @@ public class GasingStat : MonoBehaviour
         }
     }
 
-    private IEnumerator ProsesRespawn()
+    private IEnumerator ProsesRespawn()  // respawn system
     {
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -176,6 +159,13 @@ public class GasingStat : MonoBehaviour
         Debug.Log($"{gameObject.name} telah respawn di arena!");
         yield return null;
     }
+    // nanti di edit (END)
+    // udah gak berguna kayaknya !!!!!!!!!!!!!!!!!!!!!!!!(WARN) #ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f
+
+
+
+
+
 
     private void GameOverOrKalah()
     {
@@ -185,20 +175,12 @@ public class GasingStat : MonoBehaviour
 
     public void ClaimRewards(float earnedGold, float earnedExp) // funtion for reward system
     {
+        Debug.Log("Reward Claimed");
         gold += earnedGold;
         Exp += earnedExp;
 
         if (rewardText != null)
             rewardText.text = $"Gold : {gold} | Exp : {Exp}";
-    }
-
-    void HealthPlayerDecrease(float playerHPDec)
-    {
-        currentHp -= playerHPDec;
-
-        if (currentHp <= 0)
-        {
-        }
     }
 
     private void OnCollisionEnter(Collision collision)
