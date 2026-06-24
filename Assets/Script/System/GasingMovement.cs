@@ -28,6 +28,12 @@ public class GasingMovement : MonoBehaviour
     private bool isInvincible = false;
     [SerializeField] private float hitCooldown = 0.2f; // Jeda waktu antar tabrakan
 
+
+    // COROUTINE
+    private Coroutine speedBuffCoroutine = null;
+    private float originalSpeedBackup = 0f;
+    private bool isSpeedBuffActive = false;
+
     void Awake()
     {
 
@@ -217,5 +223,39 @@ public class GasingMovement : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.75f);
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
+    }
+
+    public void ApplySpeedBuff(float speedMultiplier, float duration)
+    {
+        // KUNCI: Jika sedang nge-buff speed, hentikan detikan lamanya
+        if (speedBuffCoroutine != null)
+        {
+            StopCoroutine(speedBuffCoroutine);
+            // Kembalikan ke speed awal dari backup agar tidak dikalikan terus-menerus menjadi super cepat
+            autoSpeed = originalSpeedBackup;
+        }
+
+        speedBuffCoroutine = StartCoroutine(SpeedBuffCoroutine(speedMultiplier, duration));
+    }
+
+    private IEnumerator SpeedBuffCoroutine(float speedMultiplier, float duration)
+    {
+        // Ambil backup kecepatan asli HANYA jika ini adalah ramuan pertama
+        if (!isSpeedBuffActive)
+        {
+            originalSpeedBackup = autoSpeed;
+            isSpeedBuffActive = true;
+        }
+
+        autoSpeed *= speedMultiplier;
+        Debug.Log($"[BUFF] Speed x{speedMultiplier}. Timer di-refresh kembali ke {duration} detik!");
+
+        yield return new WaitForSeconds(duration);
+
+        // Setelah durasi penuh selesai tanpa gangguan ramuan baru, kembalikan ke awal
+        autoSpeed = originalSpeedBackup;
+        isSpeedBuffActive = false;
+        speedBuffCoroutine = null; // Reset referensi
+        Debug.Log("[BUFF] Efek Speed kembali normal.");
     }
 }
