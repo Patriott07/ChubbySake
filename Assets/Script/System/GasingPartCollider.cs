@@ -33,14 +33,6 @@ public class GasingPartCollider : MonoBehaviour
             }
 
             // Cari kamera utama dan trigger guncangan
-            ActionCamera cam = Camera.main.GetComponent<ActionCamera>();
-            if (cam != null && kekuatanBenturan > 5f) // Bergetar jika tabrakan cukup keras
-            {
-
-                // TriggerShake(durasi_detik, kekuatan_getaran);
-                // cam.TriggerShake(0.15f, kekuatanBenturan * 0.05f);
-            }
         }
     }
-
 }
