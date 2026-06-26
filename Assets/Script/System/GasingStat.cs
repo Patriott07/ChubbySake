@@ -47,6 +47,12 @@ public class GasingStat : MonoBehaviour
     private float Exp, gold;
     [SerializeField] private TextMeshProUGUI rewardText;
 
+
+    // COROUTINE
+    // Variabel penampung untuk mendeteksi Coroutine yang sedang berjalan
+    private Coroutine damageBuffCoroutine = null;
+    private Coroutine invincibleBuffCoroutine = null;
+
     void Start()
     {
         if (roundText != null) roundText.text = $"Round : {roundCount.ToString()}";
@@ -167,5 +173,57 @@ public class GasingStat : MonoBehaviour
         {
             isColliding = false;
         }
+    }
+
+
+    // --- SYSTEM BUFF DAMAGE ---
+    public void ApplyDamageBuff(float additionalDamage, float duration)
+    {
+        if (damageBuffCoroutine != null)
+        {
+            StopCoroutine(damageBuffCoroutine);
+            // Kembalikan damage ke baseline sebelum menjalankan yang baru, 
+            // agar penambahannya tidak melipat ganda (compounding bug)
+            damage -= additionalDamage; 
+        }
+
+        // Jalankan ulang dari detik ke-0 dengan durasi penuh yang baru
+        damageBuffCoroutine = StartCoroutine(DamageBuffCoroutine(additionalDamage, duration));
+    }
+
+    private IEnumerator DamageBuffCoroutine(float additionalDamage, float duration)
+    {
+        damage += (damage * additionalDamage); // Tambah damage gasing
+        Debug.Log($"[BUFF] Damage meningkat sebesar +{(damage * additionalDamage)} selama {duration} detik!");
+
+        yield return new WaitForSeconds(duration);
+
+        damage -= (damage * additionalDamage); // Kembalikan damage ke semula setelah durasi habis
+        Debug.Log("[BUFF] Efek Buff Damage telah habis. Damage kembali normal.");
+    }
+
+    // --- SYSTEM REFRESH BUFF KEBAL ---
+    public void ApplyInvincibleBuff(float duration)
+    {
+        // KUNCI: Jika sedang dalam mode kebal dari potion sebelumnya, matikan coroutine lamanya
+        if (invincibleBuffCoroutine != null)
+        {
+            StopCoroutine(invincibleBuffCoroutine);
+        }
+
+        // Jalankan ulang durasi kebal dari awal
+        invincibleBuffCoroutine = StartCoroutine(InvincibleBuffCoroutine(duration));
+    }
+
+    private IEnumerator InvincibleBuffCoroutine(float duration)
+    {
+        isInvincibleAttack = true;
+        Debug.Log($"[BUFF] Mode Kebal di-refresh kembali ke {duration} detik!");
+
+        yield return new WaitForSeconds(duration);
+
+        isInvincibleAttack = false;
+        invincibleBuffCoroutine = null; // Reset referensi
+        Debug.Log("[BUFF] Efek Kebal habis.");
     }
 }
