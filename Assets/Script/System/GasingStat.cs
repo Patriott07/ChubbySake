@@ -36,6 +36,8 @@ public class GasingStat : MonoBehaviour
     public bool isInvincibleAttack = false;
     public float damageTambahanQTE;
     private bool isColliding = false;
+    [SerializeField] private DamageTextUI damageTextPrefab;
+    [SerializeField] private float offsetText;
 
     [Header("Ronde UI System")]
     [SerializeField] private TextMeshProUGUI roundText;
@@ -97,6 +99,23 @@ public class GasingStat : MonoBehaviour
         float damageAkhir = kekuatanBenturan;
 
         currentHp -= damageAkhir;
+
+        Vector3 offset = new Vector3(
+    UnityEngine.Random.Range(-offsetText, offsetText),
+    2f,
+    UnityEngine.Random.Range(-offsetText, offsetText));
+
+        if (damageTextPrefab != null)
+        {
+            DamageTextUI txt = Instantiate(
+                damageTextPrefab,
+                transform.position + offset,
+                Quaternion.identity
+            );
+
+            txt.Setup(damageAkhir, CompareTag("Player"));
+        }
+
         Debug.Log($"{gameObject.name} terkena damage sebesar {damageAkhir:F1} pada bagian {jenisPart}. Sisa HP: {currentHp:F1}");
 
         if (currentHp <= 0) RoundManager.instance.NewRound(gameObject.tag);
@@ -116,55 +135,6 @@ public class GasingStat : MonoBehaviour
         currentEnergyAttack += val;
         currentEnergyAttack = Mathf.Clamp(currentEnergyAttack, 0, maxEnergyAttack);
     }
-
-
-
-
-    // mungkin udah gak dipake #ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f
-    // nanti di edit
-    public void KurangiNyawaDanRespawn()
-    {
-        roundCount++;
-
-        currentNyawa--;
-        Debug.Log($"{gameObject.name} kehilangan 1 Nyawa! Sisa Nyawa: {currentNyawa}");
-
-        if (currentNyawa > 0)
-        {
-            StartCoroutine(ProsesRespawn());
-        }
-        else
-        {
-            GameOverOrKalah();
-        }
-    }
-
-    private IEnumerator ProsesRespawn()  // respawn system
-    {
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        if (titikRespawn != null)
-        {
-            transform.position = titikRespawn.position;
-        }
-        else
-        {
-            transform.position = Vector3.up * 2f;
-        }
-
-        currentHp = maxHp;
-        currentRPM = maxRPM;
-
-        Debug.Log($"{gameObject.name} telah respawn di arena!");
-        yield return null;
-    }
-    // nanti di edit (END)
-    // udah gak berguna kayaknya !!!!!!!!!!!!!!!!!!!!!!!!(WARN) #ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f#ff0f0f
-
-
-
-
 
 
     private void GameOverOrKalah()

@@ -1124,13 +1124,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.34682897, y: 0.39044833, z: -0.161729, w: 0.8373192}
-  m_LocalPosition: {x: -6.9945407, y: 20.820814, z: -23.857054}
+  m_LocalRotation: {x: 0.38384697, y: 0.35412195, z: -0.24398543, w: 0.8171476}
+  m_LocalPosition: {x: -6.9945407, y: 29.8, z: -23.857054}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 45, y: 50, z: 0}
+  m_LocalEulerAnglesHint: {x: 53.142, y: 40.735, z: -12.212}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1236,11 +1236,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 737570350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 161}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -20}
   m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &433987769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1288,8 +1288,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 49.57
+  m_fontSizeBase: 49.57
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1445,6 +1445,8 @@ MonoBehaviour:
   titikRespawn: {fileID: 1316162065}
   isInvincibleAttack: 0
   damageTambahanQTE: 0
+  damageTextPrefab: {fileID: 7574067998642245279, guid: ef9cfb91c9487d94c8242925589d11af, type: 3}
+  offsetText: 1
   roundText: {fileID: 433987769}
   roundCount: 1
   rewardText: {fileID: 864693275}
@@ -1915,10 +1917,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -2164,11 +2166,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 737570350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 280, y: 137}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -13, y: -62}
+  m_SizeDelta: {x: 244.6, y: 50}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &864693275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2216,8 +2218,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 58.7
+  m_fontSizeBase: 58.7
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2485,6 +2487,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 5f3da96a4ec728d43a70d9a0de3bd1df, type: 3}
       propertyPath: m_Name
       value: Arena
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5f3da96a4ec728d43a70d9a0de3bd1df, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -3145,11 +3151,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 737570350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -277, y: 118}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 38.6, y: -67.5}
+  m_SizeDelta: {x: 244.6, y: 50}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &1782931152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3197,8 +3203,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 58.7
+  m_fontSizeBase: 58.7
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3627,6 +3633,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 433987769}
     - target: {fileID: 2303387605679267149, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
+      propertyPath: offsetText
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2303387605679267149, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
       propertyPath: rewardText
       value: 
       objectReference: {fileID: 1782931152}
@@ -3634,6 +3644,10 @@ PrefabInstance:
       propertyPath: titikRespawn
       value: 
       objectReference: {fileID: 767114929}
+    - target: {fileID: 2303387605679267149, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
+      propertyPath: damageTextPrefab
+      value: 
+      objectReference: {fileID: 7574067998642245279, guid: ef9cfb91c9487d94c8242925589d11af, type: 3}
     - target: {fileID: 4172002264163435597, guid: ba57ba9293dc7b748ae94363eb1b8236, type: 3}
       propertyPath: m_Name
       value: Gasing Player
