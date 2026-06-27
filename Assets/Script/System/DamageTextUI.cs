@@ -3,35 +3,35 @@ using UnityEngine;
 
 public class DamageTextUI : MonoBehaviour
 {
-    private TextMeshPro textMesh;
-    private Color currentColor;
+  private TextMeshPro textMesh;
+  private Color currentColor;
 
-    public float moveSpeed = 2f;
-    public float lifeTime = 1f;
+  public float moveSpeed = 2f;
+  public float lifeTime = 1f;
 
-    private void Awake()
-    {
-        textMesh = GetComponent<TextMeshPro>();
-    }
+  private void Awake()
+  {
+    textMesh = GetComponent<TextMeshPro>();
+  }
 
-    public void Setup(float damage, bool playerHit)
-    {
-        textMesh.text = Mathf.RoundToInt(damage).ToString();
+  public void Setup(float damage, bool playerHit)
+  {
+    textMesh.text = Mathf.RoundToInt(damage).ToString();
 
-        currentColor = playerHit ? Color.red : Color.green;
-        textMesh.color = currentColor;
+    currentColor = playerHit ? Color.red : Color.green;
+    textMesh.color = currentColor;
 
-        Destroy(gameObject, lifeTime);
-    }
+    Destroy(gameObject, lifeTime);
+  }
 
-    private void Update()
-    {
-        transform.position += Vector3.up * moveSpeed * Time.deltaTime;
+  private void Update()
+  {
+    transform.position += Vector3.up * moveSpeed * Time.deltaTime;
 
-        currentColor.a -= Time.deltaTime / lifeTime;
-        textMesh.color = currentColor;
+    currentColor.a -= Time.deltaTime / lifeTime;
+    textMesh.color = currentColor;
 
-        if (Camera.main != null)
-            transform.forward = Camera.main.transform.forward;
-    }
+    if (Camera.main != null)
+      transform.forward = Camera.main.transform.forward;
+  }
 }

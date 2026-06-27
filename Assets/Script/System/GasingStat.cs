@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.Rendering;
 using TMPro;
 using System;
 
@@ -53,6 +52,11 @@ public class GasingStat : MonoBehaviour
     private Coroutine damageBuffCoroutine = null;
     private Coroutine invincibleBuffCoroutine = null;
 
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI RPMText;
+
+
+
     void Start()
     {
         if (roundText != null) roundText.text = $"Round : {roundCount.ToString()}";
@@ -64,6 +68,8 @@ public class GasingStat : MonoBehaviour
 
     void Update()
     {
+        if (RPMText != null) RPMText.text = $"RPM : {(int)currentRPM}";
+
         if (!isColliding && currentRPM < maxRPM)
         {
             currentRPM += rpmRegenSpeed * Time.deltaTime;
@@ -184,7 +190,7 @@ public class GasingStat : MonoBehaviour
             StopCoroutine(damageBuffCoroutine);
             // Kembalikan damage ke baseline sebelum menjalankan yang baru, 
             // agar penambahannya tidak melipat ganda (compounding bug)
-            damage -= additionalDamage; 
+            damage -= additionalDamage;
         }
 
         // Jalankan ulang dari detik ke-0 dengan durasi penuh yang baru
@@ -205,7 +211,7 @@ public class GasingStat : MonoBehaviour
     // --- SYSTEM REFRESH BUFF KEBAL ---
     public void ApplyInvincibleBuff(float duration)
     {
-        // KUNCI: Jika sedang dalam mode kebal dari potion sebelumnya, matikan coroutine lamanya
+        // KUNCI: Jika sedang dalam ode kebal dari potion sebelumnya, matikan coroutine lamanya
         if (invincibleBuffCoroutine != null)
         {
             StopCoroutine(invincibleBuffCoroutine);
