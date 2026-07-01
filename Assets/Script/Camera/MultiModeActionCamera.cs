@@ -6,7 +6,7 @@ using DG.Tweening;
 public class MultiModeActionCamera : MonoBehaviour
 {
     public enum CameraMode { IsometricAction, HardLockPlayer, TopDown, CinematicOrbit, CloseUpAction }
-    
+
     [Header("Switch Kontrol")]
     public CameraMode modeSaatIni = CameraMode.IsometricAction;
     [Tooltip("Tekan tombol ini di keyboard untuk ganti mode kamera")]
@@ -39,14 +39,14 @@ public class MultiModeActionCamera : MonoBehaviour
 
     [Header("General Tuning")]
     public float smoothSpeed = 5f;
-    
+
     private Camera cam;
     private float currentOrbitAngle = 0f;
 
     void Start()
     {
         cam = GetComponent<Camera>();
-        
+
         // Cari otomatis musuh dengan Tag "Musuh"
         GameObject[] musuhObjs = GameObject.FindGameObjectsWithTag("Musuh");
         foreach (GameObject go in musuhObjs)
@@ -103,13 +103,35 @@ public class MultiModeActionCamera : MonoBehaviour
         }
     }
 
+    public void ChangeCameraDirectly(CameraMode cameraMode)
+    {
+        switch (cameraMode)
+        {
+            case CameraMode.IsometricAction:
+                JalankanIsometricAction();
+                break;
+            case CameraMode.HardLockPlayer:
+                JalankanHardLockPlayer();
+                break;
+            case CameraMode.TopDown:
+                JalankanTopDown();
+                break;
+            case CameraMode.CinematicOrbit:
+                JalankanCinematicOrbit();
+                break;
+            case CameraMode.CloseUpAction:
+                JalankanCloseUpAction();
+                break;
+        }
+    }
+
     // Fungsi siklus ganti mode kamera (Mode 1 -> 2 -> 3 -> 4 -> 5 -> Balik ke 1)
     void NextCameraMode()
     {
         int totalMode = System.Enum.GetValues(typeof(CameraMode)).Length;
         int nextIndex = ((int)modeSaatIni + 1) % totalMode;
         modeSaatIni = (CameraMode)nextIndex;
-        
+
         Debug.Log("Kamera berganti ke mode: " + modeSaatIni.ToString());
     }
 
@@ -167,9 +189,23 @@ public class MultiModeActionCamera : MonoBehaviour
     void JalankanCloseUpAction()
     {
         // Mengikuti posisi dan arah rotasi gasing belakang player secara dramatis
-        Vector3 targetPos = playerTarget.position + (playerTarget.rotation * closeUpOffset);
+        // Vector3 targetPos = playerTarget.position + (playerTarget.rotation * closeUpOffset);
+        // transform.position = Vector3.Lerp(transform.position, targetPos, smoothSpeed * Time.deltaTime);
+        // transform.LookAt(playerTarget.position + Vector3.up * 1f);
+
+        // KUNCI UTAMA: Kita pakai Vector3 offset murni tanpa mengalikan playerTarget.rotation.
+        // Dengan begini, meskipun gasing berputar 360 derajat, posisi kamera tetap tenang di belakang.
+        Vector3 targetPos = playerTarget.position + closeUpOffset;
+
+        // Lakukan pergerakan interpolasi linear yang halus menuju posisi target
         transform.position = Vector3.Lerp(transform.position, targetPos, smoothSpeed * Time.deltaTime);
-        transform.LookAt(playerTarget.position + Vector3.up * 1f);
+
+        // Kamera tetap fokus membidik ke arah tubuh gasing player (dinaikkan sedikit sumbu Y-nya agar enak dilihat)
+        Vector3 lookAtTarget = playerTarget.position + Vector3.up * 0.5f;
+
+        // Rotasi kamera mengikuti sudut bidik secara halus agar tidak patah-patah saat gasing terpental
+        Quaternion targetRotation = Quaternion.LookRotation(lookAtTarget - transform.position);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, smoothSpeed * Time.deltaTime);
     }
 
     #endregion
@@ -212,7 +248,7 @@ public class MultiModeActionCamera : MonoBehaviour
     private IEnumerator Shake(float duration, float strength)
     {
         Vector3 originalPosition = transform.localPosition;
-        
+
         float elapsed = 0.0f;
 
         while (elapsed < duration)
@@ -230,9 +266,13 @@ public class MultiModeActionCamera : MonoBehaviour
     }
     #endregion
 
-    void OnEnable() {
-        GameEvents.CallShake += CameraShake; }
-    void OnDisable() {
-        GameEvents.CallShake -= CameraShake; }   
+    void OnEnable()
+    {
+        GameEvents.CallShake += CameraShake;
+    }
+    void OnDisable()
+    {
+        GameEvents.CallShake -= CameraShake;
+    }
 
 }

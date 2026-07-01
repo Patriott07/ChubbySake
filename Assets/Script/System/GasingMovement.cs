@@ -1,4 +1,5 @@
 using UnityEngine;
+using data.structs;
 using System.Collections;
 
 public class GasingMovement : MonoBehaviour
@@ -183,10 +184,14 @@ public class GasingMovement : MonoBehaviour
             if (stats != null)
             {
                 // Anggap kekuatan benturan dasar berdasarkan kecepatan gerak gasing (misal: 10f)
-                stats.TerimaDamagePart(GasingPartCollider.PartType.Body, enemyStats.damage, null);
-                stats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damage + (0.02f * enemyStats.currentRPM), null);
-                stats.TerimaDamagePart(GasingPartCollider.PartType.Body, enemyStats.damageTambahanQTE, null);
-                enemyStats.damageTambahanQTE = 0;
+                stats.TerimaDamagePart(PartType.Body, enemyStats.damage, null);
+                stats.TerimaDamagePart(PartType.Body, stats.damage + (0.02f * enemyStats.currentRPM), null);
+
+                if (enemyStats.damageTambahanQTE > 0)
+                {
+                    stats.TerimaDamagePart(PartType.Body, enemyStats.damageTambahanQTE, null);
+                    enemyStats.damageTambahanQTE = 0;
+                }
                 enemyStats.DecreaseRPM();
                 stats.IncreaseEnergyAttack(UnityEngine.Random.Range(100, 150));
             }
@@ -194,16 +199,17 @@ public class GasingMovement : MonoBehaviour
             // Trigger musuh agar menerima damage juga jika musuh punya GasingStat
             if (enemyStats != null)
             {
-                enemyStats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damage, null);
-                enemyStats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damage + (0.02f * stats.currentRPM), null);
-                enemyStats.TerimaDamagePart(GasingPartCollider.PartType.Body, stats.damageTambahanQTE, null);
-                Debug.Log($"ENEMY GET BONUS ATTACK : {stats.damageTambahanQTE}");
-                stats.damageTambahanQTE = 0;
+                enemyStats.TerimaDamagePart(PartType.Body, stats.damage, null);
+                enemyStats.TerimaDamagePart(PartType.Body, stats.damage + (0.02f * stats.currentRPM), null);
+                if (stats.damageTambahanQTE > 0)
+                {
+                    enemyStats.TerimaDamagePart(PartType.Body, stats.damageTambahanQTE, null);
+                    stats.damageTambahanQTE = 0;
+                    Debug.Log($"ENEMY GET BONUS ATTACK : {stats.damageTambahanQTE}");
+                }
                 stats.DecreaseRPM();
                 enemyStats.IncreaseEnergyAttack(UnityEngine.Random.Range(5, 8));
             }
-
-
         }
     }
 
@@ -217,12 +223,20 @@ public class GasingMovement : MonoBehaviour
 
     private IEnumerator SlowMotionEffect()
     {
+        // Jika gasing ini (atau gasing lawan) sedang dalam proses mati, batalkan slow-mo tabrakan biasa!
+        if (stats != null && stats.isDying) yield break;
+
         Time.timeScale = 0.1f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
         yield return new WaitForSecondsRealtime(0.75f);
-        Time.timeScale = 1f;
-        Time.fixedDeltaTime = 0.02f;
+        
+        // FIX KEBOCORAN: Hanya kembalikan ke waktu normal jika TIDAK ADA gasing yang sedang mati
+        if (stats != null && !stats.isDying)
+        {
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
+        }
     }
 
     public void ApplySpeedBuff(float speedMultiplier, float duration)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 namespace data.structs
 {
+    public enum PartType { Head, Body, Hand, Leg }
 
     [System.Serializable]
     public class PlayerData

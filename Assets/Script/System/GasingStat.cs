@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
-using TMPro;
+using System.Collections.Generic;
 using System;
+using data.structs;
 
 public class GasingStat : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class GasingStat : MonoBehaviour
     public float maxRPM = 1200f;
     public float minRPM = 400f;
     public float rpmRegenSpeed = 50f;
+
+    [Header("Energy System")]
     public float currentEnergyAttack = 0;
     public float maxEnergyAttack = 100;
     public float currentEnergyUltimate = 0;
@@ -27,39 +30,35 @@ public class GasingStat : MonoBehaviour
     public float defHand = 1.2f;
     public float defLeg = 0.9f;
 
-    [Header("Sistem Respawn")]
+    [Header("Sistem Spawning & Fisika")]
     public Transform titikRespawn;
     private Rigidbody rb;
+    private bool isColliding = false;
 
     [Header("Status Action Attack")]
     public bool isInvincibleAttack = false;
     public float damageTambahanQTE;
-    private bool isColliding = false;
+
+    [Header("Damage Pop-Up Settings")]
     [SerializeField] private DamageTextUI damageTextPrefab;
     [SerializeField] private float offsetText;
 
-    [Header("Ronde UI System")]
-    [SerializeField] private TextMeshProUGUI roundText;
-    [SerializeField] private int roundCount = 1;
+    [Header("Currency & Progression Store")]
+    private float exp;
+    private float gold;
 
-    [Header("Reward System")]
-    private float Exp, gold;
-    [SerializeField] private TextMeshProUGUI rewardText;
+    // Properti enkapsulasi agar skrip UI luar bisa membaca datanya tanpa merusak kodenya
+    public float Gold => gold;
+    public float Exp => exp;
 
-
-    // COROUTINE
-    // Variabel penampung untuk mendeteksi Coroutine yang sedang berjalan
+    // Coroutine Management
     private Coroutine damageBuffCoroutine = null;
     private Coroutine invincibleBuffCoroutine = null;
 
-    [Header("UI")]
-    [SerializeField] private TextMeshProUGUI RPMText;
-
-
+    [HideInInspector] public bool isDying = false; // Flag penanda gasing sedang dalam proses mati
 
     void Start()
     {
-        if (roundText != null) roundText.text = $"Round : {roundCount.ToString()}";
         rb = GetComponent<Rigidbody>();
 
         if (GetComponent<GasingAI>() == null)
@@ -68,8 +67,7 @@ public class GasingStat : MonoBehaviour
 
     void Update()
     {
-        if (RPMText != null) RPMText.text = $"RPM : {(int)currentRPM}";
-
+        // Regenerasi RPM otomatis saat gasing sedang tidak berbenturan kencang
         if (!isColliding && currentRPM < maxRPM)
         {
             currentRPM += rpmRegenSpeed * Time.deltaTime;
@@ -84,70 +82,94 @@ public class GasingStat : MonoBehaviour
         currentRPM = maxRPM / 4;
     }
 
-    public void TerimaDamagePart(GasingPartCollider.PartType jenisPart, float kekuatanBenturan, Action<float> action)
+    public void TerimaDamagePart(PartType jenisPart, float kekuatanBenturan, Action<float> action)
     {
         if (isInvincibleAttack || kekuatanBenturan <= 0) return;
-
         if (currentHp <= 0 || currentNyawa <= 0) return;
 
         float multiplierDefense = 1.0f;
-
         switch (jenisPart)
         {
-            case GasingPartCollider.PartType.Head:
-                multiplierDefense = defHead;
-                break;
-            case GasingPartCollider.PartType.Body:
-                multiplierDefense = defBody;
-                break;
-            case GasingPartCollider.PartType.Hand:
-                multiplierDefense = defHand;
-                break;
-            case GasingPartCollider.PartType.Leg:
-                multiplierDefense = defLeg;
-                break;
+            case PartType.Head: multiplierDefense = defHead; break;
+            case PartType.Body: multiplierDefense = defBody; break;
+            case PartType.Hand: multiplierDefense = defHand; break;
+            case PartType.Leg: multiplierDefense = defLeg; break;
         }
 
-        float damageAkhir = kekuatanBenturan;
-
+        // Hitung akumulasi defense multiplier terhadap damage masuk
+        float damageAkhir = kekuatanBenturan * multiplierDefense;
         currentHp -= damageAkhir;
 
-        Vector3 offset = new Vector3(
-    UnityEngine.Random.Range(-offsetText, offsetText),
-    2f,
-    UnityEngine.Random.Range(-offsetText, offsetText));
-
-        if (damageTextPrefab != null)
-        {
-            DamageTextUI txt = Instantiate(
-                damageTextPrefab,
-                transform.position + offset,
-                Quaternion.identity
-            );
-
-            txt.Setup(damageAkhir, CompareTag("Player"));
-        }
+        // Tembakkan Pop-up Damage Text di Canvas Dunia 3D
+        SpawnDamageText(damageAkhir);
 
         Debug.Log($"{gameObject.name} terkena damage sebesar {damageAkhir:F1} pada bagian {jenisPart}. Sisa HP: {currentHp:F1}");
 
-        if (currentHp <= 0) RoundManager.instance.NewRound(gameObject.tag);
+        if (currentHp <= 0)
+            StartCoroutine(DoDead());
 
         action?.Invoke(damageAkhir);
+    }
+
+    private IEnumerator DoDead()
+    {
+        isDying = true; // KUNCI STATUS: Gasing ini sedang mati!
+
+        Time.timeScale = 0f;
+        GameEvents.CallShake?.Invoke(0.5f, 0.4f);
+
+        HUDUIHandler uiHandler = FindObjectOfType<HUDUIHandler>();
+        if (uiHandler != null)
+        {
+            if (CompareTag("Player")) uiHandler.ShowNotificationLog("<color=red>YOU WERE DESTROYED!</color>");
+            else if (CompareTag("Enemy")) uiHandler.ShowNotificationLog("<color=orange>ENEMY ELIMINATED! +5 GOLD</color>");
+        }
+
+        yield return new WaitForSecondsRealtime(0.8f);
+
+        Time.timeScale = 0.15f;
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+        yield return new WaitForSecondsRealtime(1.8f);
+
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
+
+        isDying = false; // Buka kembali kuncinya tepat sebelum pindah ronde
+        RoundManager.instance.NewRound(gameObject.tag);
+    }
+
+    private void SpawnDamageText(float dmgValue)
+    {
+        if (damageTextPrefab == null) return;
+
+        Vector3 offset = new Vector3(
+            UnityEngine.Random.Range(-offsetText, offsetText),
+            2f,
+            UnityEngine.Random.Range(-offsetText, offsetText)
+        );
+
+        DamageTextUI txt = Instantiate(damageTextPrefab, transform.position + offset, Quaternion.identity);
+        txt.Setup(dmgValue, CompareTag("Player"));
     }
 
     public void DecreaseRPM()
     {
         float rpmMinus = UnityEngine.Random.Range(200f, 300f);
-        currentRPM -= rpmMinus;
-        currentRPM = Mathf.Clamp(currentRPM, minRPM, maxRPM);
+        currentRPM = Mathf.Clamp(currentRPM - rpmMinus, minRPM, maxRPM);
     }
 
     public void IncreaseEnergyAttack(float val)
     {
-        currentEnergyAttack += val;
-        currentEnergyAttack = Mathf.Clamp(currentEnergyAttack, 0, maxEnergyAttack);
+        currentEnergyAttack = Mathf.Clamp(currentEnergyAttack + val, 0, maxEnergyAttack);
     }
 
+    public void ClaimRewards(float earnedGold, float earnedExp)
+    {
+        gold += earnedGold;
+        exp += earnedExp;
+        Debug.Log($"[REWARD] Gold +{earnedGold} | Exp +{earnedExp} claimed successfully.");
+    }
 
     private void GameOverOrKalah()
     {
@@ -155,81 +177,57 @@ public class GasingStat : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ClaimRewards(float earnedGold, float earnedExp) // funtion for reward system
-    {
-        Debug.Log("Reward Claimed");
-        gold += earnedGold;
-        Exp += earnedExp;
-
-        if (rewardText != null)
-            rewardText.text = $"Gold : {gold} | Exp : {Exp}";
-    }
-
+    #region Collision Listeners
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Obstacle"))
-        {
             isColliding = true;
-        }
     }
 
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Obstacle"))
-        {
             isColliding = false;
-        }
     }
+    #endregion
 
-
-    // --- SYSTEM BUFF DAMAGE ---
+    #region Buff System Coroutines
     public void ApplyDamageBuff(float additionalDamage, float duration)
     {
         if (damageBuffCoroutine != null)
         {
             StopCoroutine(damageBuffCoroutine);
-            // Kembalikan damage ke baseline sebelum menjalankan yang baru, 
-            // agar penambahannya tidak melipat ganda (compounding bug)
             damage -= additionalDamage;
         }
-
-        // Jalankan ulang dari detik ke-0 dengan durasi penuh yang baru
         damageBuffCoroutine = StartCoroutine(DamageBuffCoroutine(additionalDamage, duration));
     }
 
     private IEnumerator DamageBuffCoroutine(float additionalDamage, float duration)
     {
-        damage += (damage * additionalDamage); // Tambah damage gasing
-        Debug.Log($"[BUFF] Damage meningkat sebesar +{(damage * additionalDamage)} selama {duration} detik!");
+        additionalDamage *= damage;
 
+        damage += additionalDamage;
+        Debug.Log($"[BUFF] Damage +{additionalDamage} di-refresh untuk {duration} detik!");
         yield return new WaitForSeconds(duration);
-
-        damage -= (damage * additionalDamage); // Kembalikan damage ke semula setelah durasi habis
-        Debug.Log("[BUFF] Efek Buff Damage telah habis. Damage kembali normal.");
+        damage -= additionalDamage;
+        damageBuffCoroutine = null;
     }
 
-    // --- SYSTEM REFRESH BUFF KEBAL ---
     public void ApplyInvincibleBuff(float duration)
     {
-        // KUNCI: Jika sedang dalam ode kebal dari potion sebelumnya, matikan coroutine lamanya
         if (invincibleBuffCoroutine != null)
-        {
             StopCoroutine(invincibleBuffCoroutine);
-        }
 
-        // Jalankan ulang durasi kebal dari awal
         invincibleBuffCoroutine = StartCoroutine(InvincibleBuffCoroutine(duration));
     }
 
     private IEnumerator InvincibleBuffCoroutine(float duration)
     {
         isInvincibleAttack = true;
-        Debug.Log($"[BUFF] Mode Kebal di-refresh kembali ke {duration} detik!");
-
+        Debug.Log($"[BUFF] Kebal di-refresh untuk {duration} detik!");
         yield return new WaitForSeconds(duration);
-
         isInvincibleAttack = false;
-        invincibleBuffCoroutine = null; // Reset referensi
-        Debug.Log("[BUFF] Efek Kebal habis.");
+        invincibleBuffCoroutine = null;
     }
+    #endregion
 }

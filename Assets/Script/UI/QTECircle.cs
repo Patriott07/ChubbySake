@@ -1,40 +1,50 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+
 public class QTECircle : MonoBehaviour, IPointerEnterHandler
 {
-    private float nilaiBonus = 10f; // Bonus damage dari lingkaran ini
-    [SerializeField] TMP_Text textNumber;
+    private float nilaiBonus = 10f;
+    [SerializeField] private TMP_Text textNumber;
     private GasingActionAttack actionAttackScript;
 
     void Start()
     {
         // Cari script utama di objek Player
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        nilaiBonus = Random.Range(10, 70);
-        textNumber.text = nilaiBonus.ToString();
-        if (player != null)
-        {
-            actionAttackScript = player.GetComponent<GasingActionAttack>();
-        }
+        // GameObject player = GameObject.FindGameObjectWithTag("Player");
 
-        // Hancurkan diri sendiri dalam beberapa detik jika tidak disentuh agar UI tidak penuh
-        Destroy(gameObject, 2.5f); 
+        // Pilih nilai acak bulat (menggunakan int agar teksnya tidak desimal panjang)
+        nilaiBonus = Mathf.Round(Random.Range(10f, 70f));
+
+        if (textNumber != null)
+            textNumber.text = $"+{nilaiBonus}"; // Kasi variasi visual tanda +
+
+        // if (QTESpawner.Instance != null)
+        // {
+        //     actionAttackScript = player.GetComponent<GasingActionAttack>();
+        // }
+
+        // Hancurkan diri sendiri jika diabaikan player agar UI bersih
+        // FIX: Menggunakan DestroyTrigger bawaan kemarin agar garis penghubungnya ikut hancur alami!
+        Destroy(gameObject, 2f);
     }
 
-    // 5. Efek ketika Mouse masuk/Hover ke dalam area bundaran UI ini
+    // Pemicu saat kursor Mouse/Pointer HOVER masuk ke dalam area bundaran UI ini
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // Cek apakah player juga sedang menahan tombol kiri mouse (Hold)
+        // FIX LOGIC: Hapus kondisi Input.GetMouseButton(0). Cukup arahkan kursor (Hover) 
+        // maka data damage langsung terkirim instant dan akurat walaupun game lagi slow-mo berat!
+
         if (Input.GetMouseButton(0))
         {
-            if (actionAttackScript != null)
+            if (QTESpawner.Instance != null)
             {
-                actionAttackScript.TambahBonusDamage(nilaiBonus);
+                QTESpawner.Instance.gasingActionAttack.TambahBonusDamage(nilaiBonus);
+                Debug.Log($"[QTE SUCCESS] Berhasil mengirim damage +{nilaiBonus} ke Player script.");
             }
-
-            // Hancurkan lingkaran karena berhasil diselesaikan
-            Destroy(gameObject);
         }
+
+        // Hancurkan lingkaran karena berhasil diselesaikan
+        Destroy(gameObject);
     }
 }

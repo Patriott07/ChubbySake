@@ -54,26 +54,48 @@ public class PotionItem : MonoBehaviour
 
         // Kita ambil juga referensi GasingMovement untuk memanipulasi speed jika ada
         GasingMovement movement = stats.gameObject.GetComponent<GasingMovement>();
-        
+        HUDUIHandler uiHandler = FindObjectOfType<HUDUIHandler>();
+
         switch (data.type)
         {
             case PotionType.Health:
                 // Efek Langsung (Instant)
-                stats.currentHp += data.effectValue; // Menggunakan penjumlahan flat agar aman
+                float healAmount = stats.maxHp * data.effectValue;
+                stats.currentHp += healAmount;
                 stats.currentHp = Mathf.Clamp(stats.currentHp, 0, stats.maxHp);
-                Debug.Log($"[POTION] Memulihkan HP sebesar {data.effectValue}. HP sekarang: {stats.currentHp}");
+
+                if (uiHandler != null)
+                {
+                    uiHandler.ShowNotificationLog($"{stats.name} gain {healAmount}hp");
+                }
+
+                Debug.Log($"[POTION] Memulihkan HP sebesar {healAmount}. HP sekarang: {stats.currentHp}");
                 break;
 
             case PotionType.EnergyUlt:
                 // Efek Langsung (Instant)
-                // stats.currentEnergyUlt += data.effectValue; // Sesuaikan variabel Ulti kamu
-                stats.currentEnergyUltimate = Mathf.Clamp(stats.currentEnergyUltimate + data.effectValue, 0, stats.currentEnergyUltimate);
+                stats.currentEnergyUltimate += stats.maxEnergyUltimate * data.effectValue; // Sesuaikan variabel Ulti kamu
+                stats.currentEnergyUltimate = Mathf.Clamp(stats.currentEnergyUltimate, 0, stats.currentEnergyUltimate);
+
+                if (uiHandler != null)
+                {
+                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
+                    uiHandler.ShowNotificationLog($"{stats.name} gain {stats.maxEnergyUltimate * data.effectValue} Soul Ultimate");
+                }
                 Debug.Log($"[POTION] Menambah Energy Ult sebesar {data.effectValue}");
                 break;
 
             case PotionType.EnergyAttack:
                 // Efek Langsung (Instant)
-                stats.currentEnergyAttack = Mathf.Clamp(stats.currentEnergyAttack + data.effectValue, 0, stats.maxEnergyAttack);
+                stats.currentEnergyAttack += stats.maxEnergyAttack * data.effectValue;
+                stats.currentEnergyAttack = Mathf.Clamp(stats.currentEnergyAttack, 0, stats.maxEnergyAttack);
+
+                if (uiHandler != null)
+                {
+                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
+                    uiHandler.ShowNotificationLog($"{stats.name} gain {stats.maxEnergyAttack * data.effectValue} Energy Attack");
+                }
+
                 Debug.Log($"[POTION] Menambah Energy Attack sebesar {data.effectValue}");
                 break;
 
@@ -81,18 +103,34 @@ public class PotionItem : MonoBehaviour
                 // Efek Berdurasi: Kirim perintah Coroutine ke komponen pergerakan gasing
                 if (movement != null)
                 {
+                    if (uiHandler != null)
+                    {
+                        // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
+                        uiHandler.ShowNotificationLog($"{stats.name} gain SpeedMove Bonus!");
+                    }
                     movement.ApplySpeedBuff(data.effectValue, 3f);
                 }
-                
+
                 break;
 
             case PotionType.Damage:
                 // Efek Berdurasi: Kirim perintah Coroutine ke stats gasing
+                if (uiHandler != null)
+                {
+                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
+                    uiHandler.ShowNotificationLog($"{stats.name} gain Attack Bonus!");
+                }
+
                 stats.ApplyDamageBuff(data.effectValue, 10f);
                 break;
 
             case PotionType.Kebal:
                 // Efek Berdurasi: Kirim perintah Coroutine ke stats gasing
+                if (uiHandler != null)
+                {
+                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
+                    uiHandler.ShowNotificationLog($"{stats.name} Immortality for 3s!");
+                }
                 stats.ApplyInvincibleBuff(3f);
                 break;
 

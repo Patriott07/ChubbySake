@@ -44,6 +44,7 @@ public class GasingActionAttack : MonoBehaviour
     private IEnumerator StartActionAttackSequence()
     {
         Debug.Log("ACTION ATTACK");
+        stats.currentEnergyAttack = 0f;
         isQTEActive = true;
         qteBonusDamage = 0f;
         rb.linearVelocity = Vector3.zero;
@@ -61,7 +62,7 @@ public class GasingActionAttack : MonoBehaviour
         while (qteTimer < 5f)
         {
             qteTimer += Time.unscaledDeltaTime;
-            yield return null; 
+            yield return null;
         }
 
         canvasGroupBgBlack.DOFade(0, 0.4f).SetUpdate(true);
@@ -77,7 +78,7 @@ public class GasingActionAttack : MonoBehaviour
         if (enemyTransform != null && enemyTransform.gameObject.activeInHierarchy)
         {
             stats.isInvincibleAttack = true; // Aktifkan kebal
-            
+
             // Matikan kontrol pergerakan otomatis sementara agar tidak tabrakan arah
             if (movement != null) movement.enabled = false;
 
@@ -95,7 +96,7 @@ public class GasingActionAttack : MonoBehaviour
                     dynamicAttackDir.y = 0; // Tetap kunci sumbu Y agar tidak terbang/menembus cekungan wajan
 
                     // Tembakkan Rigidbody dengan arah yang selalu diperbarui
-                    rb.linearVelocity = dynamicAttackDir * attackDashSpeed; 
+                    rb.linearVelocity = dynamicAttackDir * attackDashSpeed;
                 }
 
                 currentDashTime += Time.deltaTime;
@@ -110,11 +111,18 @@ public class GasingActionAttack : MonoBehaviour
             stats.isInvincibleAttack = false;
 
             // Reset energi kembali ke 0 setelah digunakan
+            StopCoroutine(ResetDamageQTE());
+            StartCoroutine(ResetDamageQTE());
             stats.currentEnergyAttack = 0f;
-            stats.damageTambahanQTE = 0f;
         }
 
         isQTEActive = false;
+    }
+
+    IEnumerator ResetDamageQTE()
+    {
+        yield return new WaitForSecondsRealtime(0.5f);
+        stats.damageTambahanQTE = 0f;
     }
 
     // Fungsi yang akan dipanggil oleh bundaran UI QTE saat berhasil di-hover + hold

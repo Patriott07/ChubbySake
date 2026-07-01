@@ -13,7 +13,7 @@ public class PotionSpawner : MonoBehaviour
 
     private float nextSpawnTime = 0f;
     private int maxPotion = 2;
-    private int currentPotion = 0;
+    public int currentPotion = 0;
     void Start()
     {
         // Atur spawn pertama kali relatif dari waktu mulai game
@@ -46,40 +46,34 @@ public class PotionSpawner : MonoBehaviour
 
     void Update()
     {
-        // Jatuh otomatis seiring berjalannya waktu game normal
-        if (Time.time >= nextSpawnTime && currentPotion <= maxPotion)
+        // FIX 1: Gunakan tanda < (kurang dari), jangan <= (kurang dari sama dengan)
+        // Jadi kalau currentPotion sudah bernilai 2, dia langsung memblokir spawn baru
+        if (Time.time >= nextSpawnTime && currentPotion < maxPotion)
         {
             SpawnRandomPotion();
             nextSpawnTime = Time.time + spawnInterval;
         }
     }
 
-
-
     void SpawnRandomPotion()
     {
-        if (prefabBasePotions[0] == null || listDaftarPotion == null || listDaftarPotion.Count == 0) return;
+        if (prefabBasePotions == null || prefabBasePotions.Count == 0 || listDaftarPotion == null || listDaftarPotion.Count == 0) return;
+        
+        // FIX 2: Proteksi ganda, jika jumlah sudah mencapai atau melewati batas, batalkan proses instantiate
+        if (currentPotion >= maxPotion) return;
 
-        // 1. Hitung titik koordinat acak melingkar di arena 3D (Sumbu X dan Z, Y konstan di atas permukaan)
+        // 1. Hitung titik koordinat acak melingkar di arena 3D
         Vector2 randomCircle = Random.insideUnitCircle * spawnRadiusLimit;
-        Vector3 spawnPosition = new Vector3(randomCircle.x, transform.position.y, randomCircle.y); // Angka 2f adalah tinggi jatuh bebas
+        Vector3 spawnPosition = new Vector3(randomCircle.x, transform.position.y, randomCircle.y); 
 
-        // 2. Lahirkan objek ramuannya
-        int randomIndex = Random.Range(0, listDaftarPotion.Count);
+        // 2. Lahirkan objek ramuannya secara acak sesuai list index prefab kamu
+        int randomIndex = Random.Range(0, prefabBasePotions.Count);
         GameObject newPotion = Instantiate(prefabBasePotions[randomIndex], spawnPosition, Quaternion.identity);
+        
+        // Picu event untuk menambah hitungan currentPotion
         GameEvents.OnPotionSpawn?.Invoke();
-
-        // if (potionScript != null)
-        // {
-        //     // 3. Ambil jenis ramuan secara acak dari daftar koleksi ScriptableObject kamu
-        //     int randomIndex = Random.Range(0, listDaftarPotion.Count);
-        //     PotionData selectedData = listDaftarPotion[randomIndex];
-
-        //     // Suntikkan data acak tersebut ke objek yang baru lahir
-        //     // potionScript.SetupPotion(selectedData);
-        // }
     }
-
+    
     // Untuk membantu kamu melihat batas lingkaran spawn di editor Unity
     private void OnDrawGizmosSelected()
     {

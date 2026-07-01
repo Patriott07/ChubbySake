@@ -4,29 +4,37 @@ using UnityEngine.UI;
 
 public class QTESpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject prefabBundaranQTE; 
-    [SerializeField] private float spawnRate = 0.3f; 
+    public static QTESpawner Instance;
+    [SerializeField] private GameObject prefabBundaranQTE;
+    [SerializeField] private float spawnRate = 0.3f;
     private float nextSpawnTime = 0f;
     private RectTransform rectTransform;
-    
-    public GameObject prefabGarisUI; 
+
+    public GameObject prefabGarisUI;
     public CanvasGroup canvasGroupBgBlack;
     private GameObject lastSpawnedCircle = null;
-
+    public GasingActionAttack gasingActionAttack;
     void Awake()
     {
+        Instance = this;
         rectTransform = GetComponent<RectTransform>();
+    }
+
+    void Start()
+    {
+        // GameObject player = GameObject.FindGameObjectWithTag("Player");
+        // if (player != null) gasingActionAttack = player.GetComponent<GasingActionAttack>();
     }
 
     void OnEnable()
     {
         GameEvents.OnDeleteLine?.Invoke(); // Menggunakan ?. agar aman jika event kosong
-        
+
         // FIX 1: Set waktu spawn pertama relatif terhadap waktu unscaled saat ini
         nextSpawnTime = Time.unscaledTime + spawnRate;
-        
+
         // Reset referensi lingkaran lama agar tidak membawa data dari sesi sebelumnya
-        lastSpawnedCircle = null; 
+        lastSpawnedCircle = null;
 
         if (canvasGroupBgBlack != null)
         {
@@ -76,39 +84,39 @@ public class QTESpawner : MonoBehaviour
     }
 
     void CreateLineBetweenQTE(GameObject fromCircle, GameObject toCircle)
-{
-    if (fromCircle == null || toCircle == null) return;
+    {
+        if (fromCircle == null || toCircle == null) return;
 
-    RectTransform rectFrom = fromCircle.GetComponent<RectTransform>();
-    RectTransform rectTo = toCircle.GetComponent<RectTransform>();
+        RectTransform rectFrom = fromCircle.GetComponent<RectTransform>();
+        RectTransform rectTo = toCircle.GetComponent<RectTransform>();
 
-    if (rectFrom == null || rectTo == null) return;
+        if (rectFrom == null || rectTo == null) return;
 
-    // FIX: Masukkan lineObj ke 'transform' (yaitu QTEUI / Parent dari lingkaran)
-    GameObject lineObj = Instantiate(prefabGarisUI, transform);
-    
-    // Paksa garis berada di paling atas hierarki QTEUI (di belakang semua CircleQte)
-    lineObj.transform.SetAsFirstSibling(); 
+        // FIX: Masukkan lineObj ke 'transform' (yaitu QTEUI / Parent dari lingkaran)
+        GameObject lineObj = Instantiate(prefabGarisUI, transform);
 
-    RectTransform rectLine = lineObj.GetComponent<RectTransform>();
+        // Paksa garis berada di paling atas hierarki QTEUI (di belakang semua CircleQte)
+        lineObj.transform.SetAsFirstSibling();
 
-    // Karena sekarang garis berada di parent yang sama dengan lingkaran, 
-    // kita gunakan posisi absolut anchoredPosition masing-masing
-    Vector2 posA = rectFrom.anchoredPosition;
-    Vector2 posB = rectTo.anchoredPosition;
+        RectTransform rectLine = lineObj.GetComponent<RectTransform>();
 
-    Vector2 direction = posB - posA; // Arah dari A ke B
-    float distance = direction.magnitude;
-    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // Karena sekarang garis berada di parent yang sama dengan lingkaran, 
+        // kita gunakan posisi absolut anchoredPosition masing-masing
+        Vector2 posA = rectFrom.anchoredPosition;
+        Vector2 posB = rectTo.anchoredPosition;
 
-    rectLine.anchoredPosition = posA + (direction / 2f);
-    rectLine.sizeDelta = new Vector2(distance, 10f);
-    rectLine.localRotation = Quaternion.Euler(0, 0, angle);
+        Vector2 direction = posB - posA; // Arah dari A ke B
+        float distance = direction.magnitude;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-    // KUNCI PENTING: Agar garis tetap ikut hancur saat lingkaran dituju dihancurkan,
-    // kita buat skrip kecil untuk menghancurkan garis ini saat toCircle mati, 
-    // atau gunakan fungsi bawaan OnDestroy:
-    var destroyTrigger = toCircle.AddComponent<DestroyTrigger>();
-    destroyTrigger.objectToDestroy = lineObj;
-}
+        rectLine.anchoredPosition = posA + (direction / 2f);
+        rectLine.sizeDelta = new Vector2(distance, 10f);
+        rectLine.localRotation = Quaternion.Euler(0, 0, angle);
+
+        // KUNCI PENTING: Agar garis tetap ikut hancur saat lingkaran dituju dihancurkan,
+        // kita buat skrip kecil untuk menghancurkan garis ini saat toCircle mati, 
+        // atau gunakan fungsi bawaan OnDestroy:
+        var destroyTrigger = toCircle.AddComponent<DestroyTrigger>();
+        destroyTrigger.objectToDestroy = lineObj;
+    }
 }

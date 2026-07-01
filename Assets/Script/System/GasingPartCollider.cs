@@ -1,9 +1,8 @@
 using UnityEngine;
-
+using data.structs;
 public class GasingPartCollider : MonoBehaviour
 {
     // Tentukan jenis part ini melalui Inspector Unity (Misal: HEAD, BODY, HAND, LEG)
-    public enum PartType { Head, Body, Hand, Leg }
     public PartType jenisPart;
 
     // Referensi ke script utama di Parent gasing kita

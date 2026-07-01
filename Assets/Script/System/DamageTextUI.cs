@@ -18,7 +18,7 @@ public class DamageTextUI : MonoBehaviour
   {
     textMesh.text = Mathf.RoundToInt(damage).ToString();
 
-    currentColor = playerHit ? Color.red : Color.green;
+    currentColor = playerHit ? Color.red : Color.white;
     textMesh.color = currentColor;
 
     Destroy(gameObject, lifeTime);
