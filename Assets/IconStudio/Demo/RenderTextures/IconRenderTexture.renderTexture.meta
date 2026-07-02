@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: aeb07b387ffc1ad44a634419179bb84f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 365518
+  packageName: "IconStudio \u2013 One-Click 3D to 2D Icon Generator"
+  packageVersion: 1.0.1
+  assetPath: Assets/IconStudio/Demo/RenderTextures/IconRenderTexture.renderTexture
+  uploadId: 927170

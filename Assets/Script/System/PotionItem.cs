@@ -3,47 +3,95 @@ using UnityEngine;
 public class PotionItem : MonoBehaviour
 {
     [SerializeField] private PotionData data;
+    [SerializeField] private GameObject viewModel;
+    [SerializeField] private AudioClip pickupSound;
+
     private SpriteRenderer spriteRenderer;
+    private Rigidbody rb;
     private bool isUsed = false;
+    private bool hasLanded = false;
+
+    [Header("Bobbing")]
+    [SerializeField] private float bobSpeed = 2f;
+    [SerializeField] private float bobHeight = 0.3f;
+
+    [Header("Rotation")]
+    [SerializeField] private float rotateSpeed = 30f;
+
+    private Vector3 startLocalPos;
+    private float startY;
 
     void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (viewModel == null)
+            viewModel = gameObject;
+
+        spriteRenderer = viewModel.GetComponentInChildren<SpriteRenderer>();
+        rb = GetComponent<Rigidbody>();
+
+        startLocalPos = viewModel.transform.localPosition;
+        startY = startLocalPos.y;
     }
 
     void Start()
     {
-        // Otomatis pasang gambar sesuai data ramuan
         if (data != null && spriteRenderer != null)
         {
             spriteRenderer.sprite = data.potionSprite;
         }
     }
 
-    // Fungsi untuk menyuntikkan data secara dinamis dari Spawner
+    void Update()
+    {
+        if (!hasLanded) return;
+
+        float newY = startY + Mathf.Sin(Time.time * bobSpeed) * bobHeight;
+        Vector3 pos = viewModel.transform.localPosition;
+        pos.y = newY;
+        viewModel.transform.localPosition = pos;
+
+        viewModel.transform.Rotate(Vector3.up * rotateSpeed * Time.deltaTime);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (hasLanded) return;
+        hasLanded = true;
+
+        if (rb != null)
+            rb.isKinematic = true;
+
+        startLocalPos = viewModel.transform.localPosition;
+        startY = startLocalPos.y;
+    }
+
     public void SetupPotion(PotionData newData)
     {
         data = newData;
-        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null) spriteRenderer.sprite = data.potionSprite;
+        if (spriteRenderer == null && viewModel != null)
+            spriteRenderer = viewModel.GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer != null)
+            spriteRenderer.sprite = data.potionSprite;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Pastikan objek yang menabrak memiliki komponen stats game kamu
         if (other.CompareTag("Player") || other.CompareTag("Enemy"))
         {
             if (isUsed) return;
 
             isUsed = true;
-            Debug.Log("Get Potion");
+
+            if (pickupSound != null)
+                AudioSource.PlayClipAtPoint(pickupSound, transform.position);
+
             GasingStat playerStats = other.GetComponentInParent<GasingStat>();
 
             if (playerStats != null)
             {
                 ApplyEffect(playerStats);
                 GameEvents.OnPotionCollect?.Invoke();
-                Destroy(gameObject); // Hancurkan botol setelah diambil
+                Destroy(gameObject);
             }
         }
     }
@@ -59,79 +107,71 @@ public class PotionItem : MonoBehaviour
         switch (data.type)
         {
             case PotionType.Health:
-                // Efek Langsung (Instant)
                 float healAmount = stats.maxHp * data.effectValue;
                 stats.currentHp += healAmount;
                 stats.currentHp = Mathf.Clamp(stats.currentHp, 0, stats.maxHp);
 
                 if (uiHandler != null)
-                {
                     uiHandler.ShowNotificationLog($"{stats.name} gain {healAmount}hp");
-                }
+
+                if (stats.CompareTag("Player"))
+                    PostProcessingFX.Instance?.PlayHealEffect();
 
                 Debug.Log($"[POTION] Memulihkan HP sebesar {healAmount}. HP sekarang: {stats.currentHp}");
                 break;
 
             case PotionType.EnergyUlt:
-                // Efek Langsung (Instant)
-                stats.currentEnergyUltimate += stats.maxEnergyUltimate * data.effectValue; // Sesuaikan variabel Ulti kamu
+                stats.currentEnergyUltimate += stats.maxEnergyUltimate * data.effectValue;
                 stats.currentEnergyUltimate = Mathf.Clamp(stats.currentEnergyUltimate, 0, stats.currentEnergyUltimate);
 
                 if (uiHandler != null)
-                {
-                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
                     uiHandler.ShowNotificationLog($"{stats.name} gain {stats.maxEnergyUltimate * data.effectValue} Soul Ultimate");
-                }
+
                 Debug.Log($"[POTION] Menambah Energy Ult sebesar {data.effectValue}");
                 break;
 
             case PotionType.EnergyAttack:
-                // Efek Langsung (Instant)
                 stats.currentEnergyAttack += stats.maxEnergyAttack * data.effectValue;
                 stats.currentEnergyAttack = Mathf.Clamp(stats.currentEnergyAttack, 0, stats.maxEnergyAttack);
 
                 if (uiHandler != null)
-                {
-                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
                     uiHandler.ShowNotificationLog($"{stats.name} gain {stats.maxEnergyAttack * data.effectValue} Energy Attack");
-                }
 
                 Debug.Log($"[POTION] Menambah Energy Attack sebesar {data.effectValue}");
                 break;
 
             case PotionType.SpeadMove:
-                // Efek Berdurasi: Kirim perintah Coroutine ke komponen pergerakan gasing
                 if (movement != null)
                 {
                     if (uiHandler != null)
-                    {
-                        // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
                         uiHandler.ShowNotificationLog($"{stats.name} gain SpeedMove Bonus!");
-                    }
-                    movement.ApplySpeedBuff(data.effectValue, 3f);
+
+                    movement.ApplySpeedBuff(data.effectValue, 5f);
+
+                    if (stats.CompareTag("Player"))
+                        PostProcessingFX.Instance?.PlaySpeedBoostEffect();
                 }
 
                 break;
 
             case PotionType.Damage:
-                // Efek Berdurasi: Kirim perintah Coroutine ke stats gasing
                 if (uiHandler != null)
-                {
-                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
                     uiHandler.ShowNotificationLog($"{stats.name} gain Attack Bonus!");
-                }
 
                 stats.ApplyDamageBuff(data.effectValue, 10f);
+
+                if (stats.CompareTag("Player"))
+                    PostProcessingFX.Instance?.PlayAttackEffect();
                 break;
 
             case PotionType.Kebal:
-                // Efek Berdurasi: Kirim perintah Coroutine ke stats gasing
                 if (uiHandler != null)
-                {
-                    // stats.gameObject.name bakal memunculkan nama gasing ("RUSIDD" atau "GEMINI0040")
                     uiHandler.ShowNotificationLog($"{stats.name} Immortality for 3s!");
-                }
-                stats.ApplyInvincibleBuff(3f);
+
+                stats.ApplyInvincibleBuff(data.effectValue);
+
+                if (stats.CompareTag("Player"))
+                    PostProcessingFX.Instance?.PlayHealEffect();
                 break;
 
             case PotionType.Box:

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7acc5c15aadb45142afeacf465b165fe
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 365518
+  packageName: "IconStudio \u2013 One-Click 3D to 2D Icon Generator"
+  packageVersion: 1.0.1
+  assetPath: Assets/IconStudio/Scenes/IconStudio.unity
+  uploadId: 927170

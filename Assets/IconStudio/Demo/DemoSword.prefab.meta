@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b5773c833a1ac174793ecade4a371774
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 365518
+  packageName: "IconStudio \u2013 One-Click 3D to 2D Icon Generator"
+  packageVersion: 1.0.1
+  assetPath: Assets/IconStudio/Demo/DemoSword.prefab
+  uploadId: 927170

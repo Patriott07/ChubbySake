@@ -261,8 +261,8 @@ public class GasingMovement : MonoBehaviour
             isSpeedBuffActive = true;
         }
 
-        autoSpeed *= speedMultiplier;
-        Debug.Log($"[BUFF] Speed x{speedMultiplier}. Timer di-refresh kembali ke {duration} detik!");
+        autoSpeed *= (1f + speedMultiplier);
+        Debug.Log($"[BUFF] Speed +{speedMultiplier * 100}%. Timer di-refresh kembali ke {duration} detik!");
 
         yield return new WaitForSeconds(duration);
 

@@ -40,9 +40,28 @@ namespace data.structs
 
     }
     [System.Serializable]
+    public class BattleSettings
+    {
+        public int enemyCount = 1;
+        public int difficultyLevel = 0; // 0: Normal, 1: Hard, 2: Expert
+        public int mapIndex = 0;
+    }
+
+    [System.Serializable]
     public class GameState
     {
         public PlayerData playerData;
+        public BattleSettings battleSettings = new BattleSettings();
+    }
+
+    [System.Serializable]
+    public class ProgressInGame
+    {
+        public float gold;
+        public float exp;
+        public int level = 1;
+        public List<string> unlockedGasingIDs = new List<string>();
+        public List<string> unlockedCustomizationIDs = new List<string>();
     }
 
     [System.Serializable]

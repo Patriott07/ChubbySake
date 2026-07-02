@@ -100,8 +100,10 @@ public class GasingStat : MonoBehaviour
         float damageAkhir = kekuatanBenturan * multiplierDefense;
         currentHp -= damageAkhir;
 
-        // Tembakkan Pop-up Damage Text di Canvas Dunia 3D
         SpawnDamageText(damageAkhir);
+
+        if (CompareTag("Player"))
+            PostProcessingFX.Instance?.PlayDamageEffect();
 
         Debug.Log($"{gameObject.name} terkena damage sebesar {damageAkhir:F1} pada bagian {jenisPart}. Sisa HP: {currentHp:F1}");
 
@@ -116,6 +118,11 @@ public class GasingStat : MonoBehaviour
         isDying = true; // KUNCI STATUS: Gasing ini sedang mati!
 
         Time.timeScale = 0f;
+        
+        MultiModeActionCamera cam = FindObjectOfType<MultiModeActionCamera>();
+        if (cam != null)
+            cam.modeSaatIni = MultiModeActionCamera.CameraMode.CinematicOrbit;
+
         GameEvents.CallShake?.Invoke(0.5f, 0.4f);
 
         HUDUIHandler uiHandler = FindObjectOfType<HUDUIHandler>();
@@ -124,18 +131,43 @@ public class GasingStat : MonoBehaviour
             if (CompareTag("Player")) uiHandler.ShowNotificationLog("<color=red>YOU WERE DESTROYED!</color>");
             else if (CompareTag("Enemy")) uiHandler.ShowNotificationLog("<color=orange>ENEMY ELIMINATED! +5 GOLD</color>");
         }
+        
+        yield return new WaitForSecondsRealtime(0.5f);
 
-        yield return new WaitForSecondsRealtime(0.8f);
+        // --- DEATH CINEMATIC ---
+        RigidbodyConstraints originalConstraints = rb.constraints;
+        rb.constraints = RigidbodyConstraints.None;
+
+        Vector3 randomDir = new Vector3(
+            UnityEngine.Random.Range(-1f, 1f),
+            UnityEngine.Random.Range(0.5f, 1.5f),
+            UnityEngine.Random.Range(-1f, 1f)
+        ).normalized;
+        rb.AddForce(randomDir * 8f, ForceMode.Impulse);
+        rb.AddTorque(new Vector3(
+            UnityEngine.Random.Range(-15f, 15f),
+            UnityEngine.Random.Range(-15f, 15f),
+            UnityEngine.Random.Range(-15f, 15f)
+        ), ForceMode.Impulse);
+
+        
 
         Time.timeScale = 0.15f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
-        yield return new WaitForSecondsRealtime(1.8f);
+        yield return new WaitForSecondsRealtime(1.4f);
 
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
 
-        isDying = false; // Buka kembali kuncinya tepat sebelum pindah ronde
+        rb.constraints = originalConstraints;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        if (cam != null)
+            cam.modeSaatIni = MultiModeActionCamera.CameraMode.IsometricAction;
+
+        isDying = false;
         RoundManager.instance.NewRound(gameObject.tag);
     }
 
@@ -168,6 +200,10 @@ public class GasingStat : MonoBehaviour
     {
         gold += earnedGold;
         exp += earnedExp;
+
+        if (CompareTag("Player"))
+            PostProcessingFX.Instance?.PlayRewardEffect();
+
         Debug.Log($"[REWARD] Gold +{earnedGold} | Exp +{earnedExp} claimed successfully.");
     }
 

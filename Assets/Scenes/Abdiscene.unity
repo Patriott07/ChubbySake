@@ -615,7 +615,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
@@ -3769,6 +3769,8 @@ MonoBehaviour:
   - {fileID: 842787057537155317, guid: e0ff748dcb7eedd44a7a3982418f8827, type: 3}
   - {fileID: 842787057537155317, guid: 55039e5e049dc3946b3bd01ec72cb59c, type: 3}
   - {fileID: 842787057537155317, guid: 42f70fbc642d0c8488949f0e4e855595, type: 3}
+  - {fileID: 842787057537155317, guid: a8c5a862cb9a8d64496288de61125509, type: 3}
+  - {fileID: 842787057537155317, guid: 19214caee88dd2f4182fd6beebc3d81e, type: 3}
   listDaftarPotion:
   - {fileID: 11400000, guid: eeb161ef9ef60d2498960879cf69e204, type: 2}
   - {fileID: 11400000, guid: e6748925d42434b489e69ab5fd0fd1f2, type: 2}
@@ -3969,6 +3971,76 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008588280}
   m_CullTransparentMesh: 1
+--- !u!1 &2043984383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2043984384}
+  - component: {fileID: 2043984385}
+  - component: {fileID: 2043984386}
+  m_Layer: 0
+  m_Name: PP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2043984384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043984383}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2043984385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043984383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f886d2fae8a214c4d93a88d45a50a0d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerStats: {fileID: 8834271693717195008}
+  thresholdHealthPercent: 2.4
+  maxVignetteIntensity: 0.6
+  lowHealthColor: {r: 0.990566, g: 0.08877712, b: 0.08877712, a: 0.69411767}
+  healColor: {r: 0, g: 0.9, b: 0.3, a: 1}
+  smoothSpeed: 5
+  pulseAmplitude: 12
+  pulseFrequency: 3
+--- !u!114 &2043984386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2043984383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 1
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: cfaa65ba150143b4c997208de6cbee1b, type: 2}
 --- !u!1 &2057042334
 GameObject:
   m_ObjectHideFlags: 0
@@ -4598,3 +4670,4 @@ SceneRoots:
   - {fileID: 1885176696}
   - {fileID: 1989551536}
   - {fileID: 925763086}
+  - {fileID: 2043984384}

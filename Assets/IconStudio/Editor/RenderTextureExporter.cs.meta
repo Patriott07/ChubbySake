@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 4b317c8b5bfa2424a9a3c8b856dceba4
+AssetOrigin:
+  serializedVersion: 1
+  productId: 365518
+  packageName: "IconStudio \u2013 One-Click 3D to 2D Icon Generator"
+  packageVersion: 1.0.1
+  assetPath: Assets/IconStudio/Editor/RenderTextureExporter.cs
+  uploadId: 927170

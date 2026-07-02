@@ -44,6 +44,7 @@ public class GasingActionAttack : MonoBehaviour
     private IEnumerator StartActionAttackSequence()
     {
         Debug.Log("ACTION ATTACK");
+        PostProcessingFX.Instance?.PlayAttackEffect();
         stats.currentEnergyAttack = 0f;
         isQTEActive = true;
         qteBonusDamage = 0f;

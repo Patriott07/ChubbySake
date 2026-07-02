@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using DG.Tweening;
+using data.structs;
 public class RoundManager : MonoBehaviour
 {
     [Header("Spawning & Target Objects")]
@@ -78,9 +79,9 @@ public class RoundManager : MonoBehaviour
         // Update Teks Ronde Utama
         if (roundText != null) roundText.text = $"ROUND : {roundCount}";
 
-        // 1. Teleportasi gasing ke titik spawn masing-masing
-        playerObj.transform.position = spawnPlayerLoc.position;
-        enemyObj.transform.position = spawnEnemyLoc.position;
+        // 1. Teleportasi gasing ke titik spawn masing-masing & reset rotasi
+        playerObj.transform.SetPositionAndRotation(spawnPlayerLoc.position, Quaternion.identity);
+        enemyObj.transform.SetPositionAndRotation(spawnEnemyLoc.position, Quaternion.identity);
 
         // 2. Bekukan total pergerakan fisik (Velocity) agar diam di tempat saat aba-aba
         Rigidbody playerRb = playerObj.GetComponent<Rigidbody>();
@@ -144,14 +145,26 @@ public class RoundManager : MonoBehaviour
         if (countdownText != null)
         {
             countdownText.gameObject.SetActive(true);
-            countdownText.text = playerScore > enemyScore ? "YOUU WIN!" : "YOUU LOOSE!";
+            countdownText.text = playerScore > enemyScore ? "YOU WIN!" : "YOU LOSE!";
         }
 
-        // Matikan fungsi pergerakan gasing secara permanen karena game sudah selesai
         if (playerObj.GetComponent<GasingMovement>() != null) playerObj.GetComponent<GasingMovement>().enabled = false;
         if (enemyObj.GetComponent<GasingMovement>() != null) enemyObj.GetComponent<GasingMovement>().enabled = false;
         if (enemyObj.GetComponent<GasingAI>() != null) enemyObj.GetComponent<GasingAI>().enabled = false;
 
         Debug.LogWarning("[MATCH OVER] Pertandingan selesai! Mengunci arena.");
+
+        CalculateAndShowResult();
+    }
+
+    private void CalculateAndShowResult()
+    {
+        bool isWin = playerScore > enemyScore;
+        float goldEarned = isWin ? 15f : 5f;
+        float expEarned = isWin ? 25f : 10f;
+
+        MatchResultUI resultUI = FindObjectOfType<MatchResultUI>();
+        if (resultUI != null)
+            resultUI.ShowResult(isWin, goldEarned, expEarned);
     }
 }
